@@ -37,3 +37,33 @@ fn main() {
 函数可以向调用它的代码返回值。没有对返回值进行命名，但要在箭头(->)后声明它的类型。
 
 在Rust中，函数的返回值等同于函数体最后一个表达式的值。使用`return`关键字和指定值，可从函数中提前返回；大部分函数隐式的返回最后的表达式。
+
+
+
+## 3、循环标签：在多个循环之间消除歧义
+
+如果存在嵌套循环，`break` 和 `continue` 应用于此时最内层的循环。你可以选择在一个循环上指定一个 **循环标签**（*loop label*），然后将标签与 `break` 或 `continue` 一起使用，使这些关键字应用于已标记的循环而不是最内层的循环。
+
+```rust
+fn for_exp() {
+    let a = [10, 20, 30, 40, 50];
+
+    for element in a {
+        println!("the value is: {element}");
+    }
+}
+```
+
+
+
+### 方法 rev  用来反转range
+
+```rust
+fn main() {
+    for number in (1..4).rev() {
+        println!("{number}");
+    }
+    println!("LIFTOFF!!!");
+}
+```
+
