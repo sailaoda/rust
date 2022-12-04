@@ -1,0 +1,1 @@
+E:\desktopFiles\projects\rust\1204_22_BorrowingAndSlice\dangling_references\target\debug\dangling_references.exe: E:\desktopFiles\projects\rust\1204_22_BorrowingAndSlice\dangling_references\src\main.rs
