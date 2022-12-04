@@ -1,16 +1,26 @@
-<!--
- * @Author: sailaoda
- * @Date: 2022-12-03 09:01:06
- * @LastEditors: sailaoda
- * @LastEditTime: 2022-12-03 14:21:34
- * @FilePath: \rust\README.md
- * @Description:
- *
- * Copyright (c) 2022 by hackerwu.cn, All Rights Reserved.
--->
+
 
 # rust
 
 rust daily study
 
 // 杭州早上七点十分左右 Github 进入下一天
+
+## 入门
+
+- 使用 `rustup` 安装最新稳定版的 Rust
+- 更新到新版的 Rust
+- 打开本地安装的文档
+- 直接通过 `rustc` 编写并运行 Hello, world! 程序
+- 使用 Cargo 创建并运行新项目
+
+## 常见概念
+
+变量、标量和复合数据类型、函数、注释、 `if` 表达式和循环
+
+## 所有权
+
+- 在任意给定时间，**要么** 只能有一个可变引用，**要么** 只能有多个不可变引用。
+- 引用必须总是有效的。
+
+所有权、借用和 slice 这些概念让 Rust 程序在编译时确保内存安全。Rust 语言提供了跟其他系统编程语言相同的方式来控制你使用的内存，但拥有数据所有者在离开作用域后自动清除其数据的功能意味着你无须额外编写和调试相关的控制代码。

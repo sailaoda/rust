@@ -1,3 +1,13 @@
+/*
+ * @Author: sailaoda
+ * @Date: 2022-12-03 07:46:00
+ * @LastEditors: sailaoda
+ * @LastEditTime: 2022-12-04 23:27:56
+ * @FilePath: \rust\1203_22_MoveAndCopy\about_move\src\main.rs
+ * @Description:
+ *
+ * Copyright (c) 2022 by hackerwu.cn, All Rights Reserved.
+ */
 fn main() {
     let x = 5;
     let y = x;
