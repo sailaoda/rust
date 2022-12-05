@@ -60,3 +60,47 @@ rust daily study
 ### match
 
 `match` 的极为强大的控制流运算符，它允许我们将一个值与一系列的模式相比较，并根据相匹配的模式执行相应代码
+
+**匹配是穷尽的**，这些分支必须覆盖了所有的可能性。
+
+### 通配模式和_占位符
+
+```rust
+let dice_roll = 9;
+match dice_roll {
+    3 => add_fancy_hat(),
+    7 => remove_fancy_hat(),
+    // other => move_player(other),
+    // _ => reroll(),
+    _ => (),    // 不运行任何代码
+}
+
+fn add_fancy_hat() {}
+fn remove_fancy_hat() {}
+fn move_player(num_spaces: u8) {}
+fn reroll() {}
+```
+
+使用 `_` ，这是一个特殊的模式，可以匹配任意值而不绑定到该值。这告诉 Rust 我们不会使用这个值，所以 Rust 也不会警告我们存在未使用的变量。
+
+### if let 简洁控制流
+
+```rust
+let mut count = 0;
+match coin {
+    Coin::Quarter(state) => println!("State quarter from {:?}!", state),
+    _ => count += 1,
+}
+```
+
+等价于
+
+```rust
+let mut count = 0;
+if let Coin::Quarter(state) = coin {
+    println!("State quarter from {:?}!", state);
+} else {
+    count += 1;
+}
+```
+
