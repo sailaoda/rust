@@ -4,7 +4,9 @@
 
 rust daily study
 
-// 杭州早上七点十分左右 Github 进入下一天
+[Rust程序设计语言](https://kaisery.github.io/trpl-zh-cn/)
+
+
 
 ## 入门
 
