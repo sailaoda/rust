@@ -4,7 +4,9 @@
 
 rust daily study
 
-[Rust程序设计语言](https://kaisery.github.io/trpl-zh-cn/)
+[Rust程序设计语言](https://kaisery.github.io/trpl-zh-cn/)   -->   [Writing an OS in Rust](https://www.bookstack.cn/read/writing-an-os-in-rust/README.md)
+
+-->    [Rust死灵书](https://www.bookstack.cn/read/rustonomicon_zh-CN/src-0.%E7%AE%80%E4%BB%8B.md)
 
 
 
