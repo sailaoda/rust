@@ -160,3 +160,18 @@ use std::collections::*;
 - **哈希 map**（*hash map*）允许我们将值与一个特定的键（key）相关联。这是一个叫做 *map* 的更通用的数据结构的特定实现。
 
 **vector 允许我们在一个单独的数据结构中储存多于一个的值，它在内存中彼此相邻地排列所有的值。vector 只能储存相同类型的值。**
+
+```rust
+    let s = String::from("initial contents");
+    // 等同于
+    let s = "initial contents".to_string();
+
+```
+
+使用 push_str 和 push 附加字符串
+
+### Strings
+
+使用 + 运算符或 format! 宏拼接字符串
+
+**Rust 的字符串不支持索引。**
