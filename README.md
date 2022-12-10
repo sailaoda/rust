@@ -159,7 +159,31 @@ use std::collections::*;
 - **字符串**（*string*）是字符的集合。我们之前见过 `String` 类型，不过在本章我们将深入了解。
 - **哈希 map**（*hash map*）允许我们将值与一个特定的键（key）相关联。这是一个叫做 *map* 的更通用的数据结构的特定实现。
 
+### Vector
+
 **vector 允许我们在一个单独的数据结构中储存多于一个的值，它在内存中彼此相邻地排列所有的值。vector 只能储存相同类型的值。**
+
+```rust
+// 遍历 vector 中的元素
+    {
+        let v = vec![100, 32, 57];
+        for i in &v {
+            println!("{}", i);
+        }
+    }
+
+    {
+        let mut v = vec![100, 23, 43];
+        for i in &mut v {
+            *i += 50;
+        }
+    }
+
+v.get(100);
+v.push(200);
+```
+
+### Strings
 
 ```rust
     let s = String::from("initial contents");
@@ -170,7 +194,6 @@ use std::collections::*;
 
 使用 push_str 和 push 附加字符串
 
-### Strings
 
 使用 + 运算符或 format! 宏拼接字符串
 
