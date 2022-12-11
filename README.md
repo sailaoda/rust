@@ -198,3 +198,24 @@ v.push(200);
 使用 + 运算符或 format! 宏拼接字符串
 
 **Rust 的字符串不支持索引。**
+
+### HashMap
+
+```rust
+    use std::collections::HashMap;
+
+    // 利用insert 创建HashMap
+    let mut scores = HashMap::new;
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+
+    // 用队伍列表和分数列表创建哈希map
+    let teams = vec![String::from("Blue"), String::from("Yellow")];
+    let initial_scores = vec![10, 50];
+
+    // 这里 HashMap<_, _> 类型注解是必要的，因为可能 collect 为很多不同的数据结构
+    let mut scores: HashMap<_, _> = 
+        teams.into_iter().zip(initial_scores.into_iter()).collect();
+
+```
