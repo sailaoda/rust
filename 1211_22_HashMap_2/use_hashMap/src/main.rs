@@ -2,7 +2,7 @@
  * @Author: sailaoda
  * @Date: 2022-12-11 23:36:58
  * @LastEditors: sailaoda
- * @LastEditTime: 2022-12-11 23:43:56
+ * @LastEditTime: 2022-12-11 23:52:54
  * @FilePath: \daily_study\rust\1211_22_HashMap_2\use_hashMap\src\main.rs
  * @Description:
  *
@@ -37,5 +37,29 @@ fn main() {
     scores.insert(String::from("Blue"), 30);
     println!("{:#?}", scores);
 
-    
+    // 只在键没有对应值时插入    entry
+    scores.entry(String::from("Yellow")).or_insert(50);
+    scores.entry(String::from("Red")).or_insert(88);
+
+    println!("{:#?}", scores);
+
+    // Entry 的 or_insert 方法在键对应的值存在时就返回这个值的可变引用
+
+    // 根据旧值更新一个新值
+    // 通过哈希 map 储存单词和计数来统计出现次数
+    let text = "hello world wonderful world";
+
+    let mut map = HashMap::new();
+
+    // 所有这些改变都是安全的并符合借用规则
+    for word in text.split_whitespace() {
+        let count = map.entry(word).or_insert(0);
+        *count += 1;
+    }
+
+    println!("{:#?}", map);
+
+    // HashMap 默认使用一种叫做 SipHash 的哈希函数，
+    // 它可以抵御涉及哈希表（hash table）1 的拒绝服务（Denial of Service, DoS）攻击。
+
 }
