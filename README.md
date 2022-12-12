@@ -334,3 +334,29 @@ fn read_username_from_file() -> Result<String, io::Error> {
 可以在返回 `Result` 的函数中对 `Result` 使用 `?` 运算符，可以在返回 `Option` 的函数中对 `Option` 使用 `?` 运算符，但是不可以混合搭配。
 
 - ### 要不要panic!
+
+一个 `Guess` 类型，它只在值位于 1 和 100 之间时才继续
+
+```rust
+#![allow(unused)]
+fn main() {
+pub struct Guess {
+    value: i32,
+}
+
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 || value > 100 {
+            panic!("Guess value must be between 1 and 100, got {}.", value);
+        }
+
+        Guess { value }
+    }
+
+    pub fn value(&self) -> i32 {
+        self.value
+    }
+}
+}
+```
+
