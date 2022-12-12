@@ -252,6 +252,40 @@ enum Result<T, E> {
 
 #### 匹配不同的错误
 
+```rust
+use std::fs::File;
+use std::io::ErrorKind;
 
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => match error.kind() {
+            ErrorKind::NotFound => match File::create("hello.txt") {
+                Ok(fc) => fc,
+                Err(e) => panic!("Problem creating the file: {:#?}", e),
+            },
+            other_error => {
+                panic!("Problem opening the file: {:#?}", other_error)
+            }
+        },
+    };
+
+    println!("Hello, world!");
+}
+```
+
+#### 失败时panic的简写：`unwrap`和`expect`
+
+```rust
+let f = File::open("hello.txt").unwrap();
+
+let f = File::open("hello.txt").expect("Failed to open hello.txt");
+```
+
+#### 传播错误
+
+当编写一个其实先会调用一些可能会失败的操作的函数时，除了在这个函数中处理错误外，还可以选择让调用者知道这个错误并决定该如何处理。这被称为 **传播**（*propagating*）错误
 
 - ### 要不要panic!
