@@ -219,3 +219,39 @@ v.push(200);
         teams.into_iter().zip(initial_scores.into_iter()).collect();
 
 ```
+
+
+
+## 错误处理
+
+- ### 用panic!处理不可恢复的错误
+
+当出现 panic 时，程序默认会开始 **展开**（*unwinding*），这意味着 Rust 会回溯栈并清理它遇到的每一个函数的数据，不过这个回溯并清理的过程有很多工作。另一种选择是直接 **终止**（*abort*），这会不清理数据就退出程序。那么程序所使用的内存需要由操作系统来清理。
+
+选择 abort 可以直接在 `cargo.toml`文件中的 `[profile]`部分增加 `panic = 'abort'`，可以由展开切换为终止。
+
+**使用 `panic!`的 `backtrace`**
+
+`RUST_BACKTRACE=1 cargo run`
+
+- ### 用Result处理可恢复的错误
+
+#### 使用 match 表达式处理可能会返回的 Result 成员
+
+`Result`枚举定义有两个成员， Ok 和 Err：
+
+```rust
+// T 和 E 是泛型类型参数
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+`File::open` 函数的返回值类型是 `Result<T, E>`。这里泛型参数 `T` 放入了成功值的类型 `std::fs::File`，它是一个文件句柄。`E` 被用在失败值上时 `E` 的类型是 `std::io::Error`
+
+#### 匹配不同的错误
+
+
+
+- ### 要不要panic!
