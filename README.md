@@ -374,5 +374,56 @@ impl Guess {
 
 标准库中定义的 `std::cmp::PartialOrd` trait 可以实现类型的比较功能
 
+#### 结构体中定义的泛型
+
+字段 `x` 和 `y` **都是** 相同类型的
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+fn main() {
+    let integer = Point {x: 5, y: 10};
+    let float = Point {x: 1.0, y: 4.0};
+}
+```
+
+两个字段有不同类型且仍然是泛型的Point结构体：
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+fn main() {
+    let both_integer = Point {x: 5, y: 10};
+    let both_float = Point {x: 1.0, y: 4.0};
+    let integer_and_float = Point {x: 5, y: 4.0};
+}
+```
+
+#### 枚举定义中的泛型
+
+```rust
+enum Option<T> {
+    Some(T),
+    None,
+}
+```
+
+枚举也可以有多个泛型类型， 比如 `Result`
+
+```rust
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+#### 方法定义中的泛型
+
 
 
