@@ -1,0 +1,1 @@
+E:\desktopFiles\projects\rust\1215_22_TraitOthers\impl_trait\target\debug\impl_trait.exe: E:\desktopFiles\projects\rust\1215_22_TraitOthers\impl_trait\src\lib.rs E:\desktopFiles\projects\rust\1215_22_TraitOthers\impl_trait\src\main.rs

@@ -493,9 +493,11 @@ pub trait Summary {
 }
 ```
 
+**不能为外部类型实现外部 trait。**
 
+例如，不能在 `aggregator` crate 中为 `Vec<T>` 实现 `Display` trait。这是因为 `Display` 和 `Vec<T>` 都定义于标准库中，它们并不位于 `aggregator` crate 本地作用域中。这个限制是被称为 **相干性**（*coherence*） 的程序属性的一部分，或者更具体的说是 **孤儿规则**（*orphan rule*），其得名于不存在父类型。
 
-
+#### 默认实现
 
 
 
