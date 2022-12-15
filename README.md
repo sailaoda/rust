@@ -497,11 +497,48 @@ pub trait Summary {
 
 例如，不能在 `aggregator` crate 中为 `Vec<T>` 实现 `Display` trait。这是因为 `Display` 和 `Vec<T>` 都定义于标准库中，它们并不位于 `aggregator` crate 本地作用域中。这个限制是被称为 **相干性**（*coherence*） 的程序属性的一部分，或者更具体的说是 **孤儿规则**（*orphan rule*），其得名于不存在父类型。
 
-#### 默认实现
+impl Trait 是一种较长形式语法的语法糖。
+
+#### trait bound
+
+```rust
+pub fn notify<T: Summary>(item: &T) {
+  println!("Breaking news! {}", item.summarize());
+}
+
+// impl Trait 很方便，适用于短小的例子。trait bound 则适用于更复杂的场景。
+pub fn notify(item1: &impl Summary, item2: &impl Summary) {}
+
+// item1 和 item2 需要时相同类型时
+pub fn notify<T: Summary>(item1: &T, item2: &T) {}
+
+// 通过 + 指定多个 trait bound
+pub fn notify(item: &(impl Summary + Display)) {}
+
+pub fn notify<T:Summary + Display>(item: &T) {}
+```
 
 
 
+#### 通过 where 简化 trait bound
 
+使用过多的 trait bound 也有缺点。每个泛型有其自己的 trait bound，
+
+所以有多个泛型参数的函数在名称和参数列表之间会有很长的 trait bound 信息，
+
+这使得函数签名难以阅读。
+
+```rust
+// 为此，Rust 有另一个在函数签名之后的 where 从句中指定 trait bound 的语法。
+fn some_function<T: Display + Clone, U: Clone + Debug>(t: &T, u: &U) -> i32 {}
+
+// 使用 where 从句
+fn some_function<T, U>(t: &T, u: &U) -> i32
+  where T: Display + Clone,
+        U: Clone + Debug {}
+```
+
+trait 和 trait bound 让我们使用泛型类型参数来减少重复，并仍然能够向编译器明确指定泛型类型需要拥有哪些行为。因为我们向编译器提供了 trait bound 信息，它就可以检查代码中所用到的具体类型是否提供了正确的行为。
 
 
 
