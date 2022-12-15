@@ -628,5 +628,94 @@ fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 
 它的实际含义是 longest 函数返回的引用的生命周期与传入该函数的引用的生命周期的较小者一致。
 
+一个存放引用的结构体，其定义需要生命周期注解
+
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().expect("Could not find a '.'");
+    let i = ImportantExcerpt {
+        part: first_sentence,
+    };
+}
+```
+
+#### 生命周期省略（Lifetime Elision）
+
+被编码进 Rust 引用分析的模式被称为 **生命周期省略规则**（*lifetime elision rules*）。这并不是需要程序员遵守的规则；这些规则是一系列特定的场景，此时编译器会考虑，如果代码符合这些场景，就无需明确指定生命周期。
+
+函数或方法的参数的生命周期被称为 **输入生命周期**（*input lifetimes*），而返回值的生命周期被称为 **输出生命周期**（*output lifetimes*）。
+
+编译器采用三条规则来判断引用何时不需要明确的注解。第一条规则适用于输入生命周期，后两条规则适用于输出生命周期。
+
+第一条规则是每一个是引用的参数都有它自己的生命周期参数。
+
+第二条规则是如果只有一个输入生命周期参数
+
+第三条规则是如果方法有多个输入生命周期参数并且其中一个参数是 `&self` 或 `&mut self`，说明是个对象的方法(method)(译者注： 这里涉及rust的面向对象参见17章)，那么所有输出生命周期参数被赋予 `self` 的生命周期。
+
+#### 方法定义中的生命周期注解
+
+（实现方法时）结构体字段的生命周期必须总是在 `impl` 关键字之后声明并在结构体名称之后被使用，因为这些生命周期是结构体类型的一部分。
+
+`impl` 块里的方法签名中，引用可能与结构体字段中的引用相关联，也可能是独立的。另外，生命周期省略规则也经常让我们无需在方法签名中使用生命周期注解。
+
+#### 静态生命周期
+
+`'static` 其生命周期能够存活于整个程序期间。所有的字符串字面值都拥有 `'static`生命周期
+
+```rust
+let s: &'static str = "I have a static lifetime.";
+```
+
+这个字符串的文本被直接储存在程序的二进制文件中而这个文件总是可用的。因此所有的字符串字面值都是 `'static` 的。
+
+考虑一下再使用，是否真的要让它的生命周期存在得那么久。
+
+#### 结合泛型类型参数、trait bounds 和生命周期
+
+```rust
+// 在同一函数中指定泛型类型参数、trait bounds 和生命周期的语法
+
+fn main() {
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    let result = longest_with_an_announcement(
+        string1.as_str(),
+        string2,
+        "Today is someone's birthday!",
+    );
+    println!("The longest string is {}", result);
+}
+
+use std::fmt::Display;
+
+fn longest_with_an_announcement<'a, T>(
+    x: &'a str,
+    y: &'a str,
+    ann: T,
+) -> &'a str
+where
+    T: Display,
+{
+    println!("Announcement! {}", ann);
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+```
+
+
+
+
+
 
 

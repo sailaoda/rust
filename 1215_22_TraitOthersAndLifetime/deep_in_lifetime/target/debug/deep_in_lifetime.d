@@ -1,0 +1,1 @@
+E:\desktopFiles\projects\rust\1215_22_TraitOthersAndLifetime\deep_in_lifetime\target\debug\deep_in_lifetime.exe: E:\desktopFiles\projects\rust\1215_22_TraitOthersAndLifetime\deep_in_lifetime\src\main.rs
