@@ -220,6 +220,18 @@ v.push(200);
 
 ```
 
+HashMap 的几种操作
+
+```rust
+map.insert();
+
+map.entry().or_insert();
+
+for (key, value) in &map {
+    println!("{}: {}", key, value);
+}
+```
+
 
 
 ## 错误处理
