@@ -861,17 +861,125 @@ mod tests {
 
 
 
+### 控制测试如何运行
 
+可以指定命令行参数来改变 `cargo test` 的默认行为。
 
+可以将一部分命令行参数传递给 `cargo test`，而将另外一部分传递给生成的测试二进制文件。为了分隔这两种参数，需要先列出传递给 `cargo test` 的参数，接着是分隔符 `--`，再之后是传递给测试二进制文件的参数。
 
+#### 并行或连续的运行测试
 
+当运行多个测试时， Rust 默认使用线程来并行运行。
 
+因为测试是在同时运行的，你应该确保测试不能相互依赖，或依赖任何共享的状态，包括依赖共享的环境，比如当前工作目录或者环境变量。
 
+如果你不希望测试并行运行，或者想要更加精确的控制线程的数量，可以传递 `--test-threads` 参数和希望使用线程的数量给测试二进制文件。例如：
 
+```bash
+cargo test -- --test-threads=1
+```
 
+这里将测试线程设置为 `1`，告诉程序不要使用任何并行机制。
 
+#### 显示函数输出
 
+默认情况下，当测试通过时，Rust的测试库会截获打印到标准输出的所有内容。
 
+如下，一个调用了`println!`的函数的测试，
 
+它打印参数的值并接着返回10，接着还有一个会通过的测试和一个会失败的测试：
 
+```rust
+fn prints_and_returns_10(a: i32) -> i32 {
+    println!("I got the value {}", a);
+    10
+}
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn this_test_will_pass() {
+        let value = prints_and_returns_10(4);
+        assert_eq!(10, value);
+    }
+    
+    #[test]
+    fn this_test_will_fail() {
+        let value = prints_and_returns_10(8);
+        assert_eq!(5, value);
+    }
+}
+```
+
+如果你希望也能看到通过的测试中打印的值，也可以在结尾加上 `--show-output` 告诉 Rust 显示成功测试的输出。
+
+```bash
+cargo test -- --show-output
+```
+
+#### 通过指定名字来运行部分测试
+
+可以向 `cargo test` 传递所希望运行的测试名称的参数来选择运行哪些测试。
+
+```rust
+pub fn add_two(a: i32) -> i32 {
+    a + 2
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn add_two_and_two() {
+        assert_eq!(4, add_two(2));
+    }
+    
+    #[test]
+    fn add_three_and_two() {
+        assert_eq!(5, add_two(3));
+    }
+    
+    #[test]
+    fn one_hundred() {
+        assert_eq!(102, add_two(100));
+    }
+}
+```
+
+运行全部测试：`cargo test`
+
+运行单个测试：`cargo test one_hundred`
+
+可以向`cargo test`传递任意测试的名称来只运行这个测试。只有传递给 `cargo test` 的第一个值才会被使用。
+
+#### 过滤运行多个测试
+
+我们可以指定部分测试的名称，任何名称匹配这个名称的测试会被运行。
+
+例如：`cargo test add`， 可以只运行那两个带有add的测试函数。同时注意测试所在的模块也是测试名称的一部分，所以可以通过模块名来运行一个模块中的所有测试。
+
+#### 忽略某些测试
+
+使用 `ignore` 属性来标记耗时的测试并排除他们。
+
+```rust
+#[test]
+fn it_works() {
+    assert_eq!(2 + 2, 4);
+}
+
+#[test]
+#[ignore]
+fn expensive_test() {
+    // 需要运行一个小时的代码
+}
+```
+
+对于想要排除的测试，我们在 `#[test]` 之后增加了 `#[ignore]` 行。
+
+如果我们只希望运行被忽略的测试，可以使用 `cargo test -- --ignored`
+
+不管是否忽略都要运行全部测试，可以运行 `cargo test -- --include-ignored`。
