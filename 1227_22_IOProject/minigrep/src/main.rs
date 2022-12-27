@@ -1,6 +1,8 @@
 use std::env;
-use std::fs;
+
 use std::process;
+
+use minigrep::Config;
 
 /* 注意 std::env::args 在其任何参数包含无效 Unicode 字符时会 panic。
 如果你需要接受包含无效 Unicode 字符的参数，使用 std::env::args_os 代替。
@@ -31,20 +33,25 @@ fn main() {
     println!("In file {}", config.filename);
 
 
+    // let contents = fs::read_to_string(config.filename).expect("Something went wrong reading the file");
+    // println!("With text:\n{}", contents);
+    // 从main提取逻辑
+    // run(config);
 
-    let contents = fs::read_to_string(config.filename).expect("Something went wrong reading the file");
+    if let Err(e) = minigrep::run(config) {
+        println!("Application error: {}", e);
 
-    println!("With text:\n{}", contents);
+        process::exit(1);
+    }
 }
 
-// 组合配置值
-// 在之前的 parse_config 函数体中，
-// 我们返回了引用 args 中 String 值的字符串 slice，
-// 现在我们定义 Config 来包含拥有所有权的 String 值。
-struct Config {
-    query: String,
-    filename: String,
-}
+// 从main提取逻辑
+// 提取 run 函数来包含剩余的程序逻辑
+// 从run中返回错误
+
+
+
+
 
 // 提取参数解析器
 /* fn parse_config(args: &[String]) -> (&str, &str) {
@@ -60,20 +67,4 @@ fn parse_config(args: &[String]) -> Config {
     Config {query, filename}
 }
 
-// 创建一个 Config 的构造函数
-// (从 new 中返回 Result 而不是调用 panic!)
-impl Config {
-    fn new(args: &[String]) -> Result<Config, &'static str> {
 
-        // 改善错误信息
-        if args.len() < 3 {
-            // panic!("not enough arguments");
-            return Err("not enough arguments");
-        }
-
-        let query = args[1].clone();
-        let filename = args[2].clone();
-
-        Ok(Config { query, filename })
-    }
-}
