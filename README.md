@@ -1086,3 +1086,61 @@ cargo test --test integration_test
 能够获取传递给它的命令行参数的值：Rust标准库提供的函数，`std::env::args`。这个函数返回一个传递给程序的命令行参数的迭代器(iterator)。
 
 迭代器的两个细节：迭代器生成一系列的值，可以在迭代器上调用 collect 方法将其转换为一个集合。
+
+### 重构改进模块性和错误处理
+
+`parse_config` 名称的 `config` 部分，它暗示了我们返回的两个值是相关的并都是一个配置值的一部分。目前除了将这两个值组合进元组之外并没有表达这个数据结构的意义：我们可以将这两个值放入一个结构体并给每个字段一个有意义的名字。这会让未来的维护者更容易理解不同的值如何相互关联以及他们的目的。
+
+这种在复杂类型更为合适的场景下使用基本类型的反模式称为 **基本类型偏执**（*primitive obsession*）
+
+```rust
+use std::env;
+use std::fs;
+
+/* 注意 std::env::args 在其任何参数包含无效 Unicode 字符时会 panic。
+如果你需要接受包含无效 Unicode 字符的参数，使用 std::env::args_os 代替。
+这个函数返回 OsString 值而不是 String 值。
+这里出于简单考虑使用了 std::env::args，
+因为 OsString 值每个平台都不一样而且比 String 值处理起来更为复杂。 */
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    // let query = &args[1];
+    // let filename = &args[2];
+    // let (query, filename) = parse_config(&args);
+    let config = parse_config(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename).expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+
+// 组合配置值
+struct Config {
+    query: String,
+    filename: String,
+}
+
+// 提取参数解析器
+/* fn parse_config(args: &[String]) -> (&str, &str) {
+    let query = &args[1];
+    let filename = &args[2];
+    (query, filename)
+} */
+fn parse_config(args: &[String]) -> Config {
+    let query = args[1].clone();
+    let filename = args[2].clone();
+
+    Config {query, filename}
+}
+```
+
+
+
+
+
+
+
