@@ -1,0 +1,1 @@
+E:\desktopFiles\projects\rust\1228_22_ProjectAddition\minigrep\target\debug\minigrep.exe: E:\desktopFiles\projects\rust\1228_22_ProjectAddition\minigrep\src\lib.rs E:\desktopFiles\projects\rust\1228_22_ProjectAddition\minigrep\src\main.rs
