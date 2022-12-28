@@ -22,15 +22,16 @@ fn main() {
 
     // Config::new 调用并处理错误
     let config = Config::new(&args).unwrap_or_else(|err| {
-        println!("Problem parsing arguments: {}", err);
+        // println!("Problem parsing arguments: {}", err);
+        eprintln!("Problem parsing arguments: {}", err);
         // 手动实现原先由 panic!负责的工作，即以非零错误码退出命令行工具的工作。
         // 非零的退出状态是一个惯例信号，
         // 用来告诉调用程序的进程：该程序以错误状态退出了。
         process::exit(1);
     });
 
-    println!("Searching for {}", config.query);
-    println!("In file {}", config.filename);
+    /* println!("Searching for {}", config.query);
+    println!("In file {}", config.filename); */
 
 
     // let contents = fs::read_to_string(config.filename).expect("Something went wrong reading the file");
@@ -39,8 +40,8 @@ fn main() {
     // run(config);
 
     if let Err(e) = minigrep::run(config) {
-        println!("Application error: {}", e);
-
+        // println!("Application error: {}", e);
+        eprintln!("Application error: {}", e);
         process::exit(1);
     }
 }
@@ -60,11 +61,11 @@ fn main() {
 
     (query, filename)
 } */
-fn parse_config(args: &[String]) -> Config {
+/* fn parse_config(args: &[String]) -> Config {
     let query = args[1].clone();
     let filename = args[2].clone();
 
     Config {query, filename}
-}
+} */
 
 
