@@ -1427,8 +1427,74 @@ fn main() {
 
 ```rust
 let equal_to_x = move |z| z == x;  
-// 会获取x的suo'y
+// 会获取x的所有权
 ```
+
+### 使用迭代器处理元素序列
+
+迭代器模式允许你对一个序列的项进行某些处理。**迭代器**（*iterator*）负责遍历序列中的每一项和决定序列何时结束的逻辑。
+
+在Rust中，迭代器是惰性的(lazy)，这意味着在调用方法使用迭代器之前它都不会有效果。
+
+```rust
+// 在一个for循环中使用迭代器
+let v1 = vec![1, 2, 3];
+let v1_iter = v1.iter();
+for val in v1_iter {
+    println!("Got: {}", val);
+}
+```
+
+迭代器的实现方式提供了对多种不同的序列使用相同逻辑的灵活性，而不仅仅是像 vector 这样可索引的数据结构。
+
+#### Iterator trait 和 next 方法
+
+迭代器都实现了一个叫做 Iterator 的定义于标准库的trait。
+
+```rust
+pub trait Iterator {
+    type Item;
+    
+    fn next(&mut self) -> Option<Self::Item>;
+    // 省略方法的默认实现
+}
+```
+
+`type Item`和`Self::Item`，他们定义了 trait 的关联类型(associated type)
+
+这段代码表明实现 `Iterator` trait 要求同时定义一个 `Item` 类型，这个 `Item` 类型被用作 `next` 方法的返回值类型。换句话说，`Item` 类型将是迭代器返回元素的类型。
+
+注意 `v1_iter` 需要是可变的：在迭代器上调用 `next` 方法改变了迭代器中用来记录序列位置的状态。换句话说，代码 **消费**（consume）了，或使用了迭代器。每一个 `next` 调用都会从迭代器中消费一个项。
+
+#### 消费迭代器的方法
+
+这些调用 `next` 方法的方法被称为 **消费适配器**（*consuming adaptors*），因为调用他们会消耗迭代器。一个消费适配器的例子是 `sum` 方法。这个方法获取迭代器的所有权并反复调用 `next` 来遍历迭代器，因而会消费迭代器。当其遍历每一个项时，它将每一个项加总到一个总和并在迭代完成时返回总和。
+
+```rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn iterator_sum() {
+        let v1 = vec![1, 2, 3];
+
+        let v1_iter = v1.iter();
+
+        let total: i32 = v1_iter.sum();
+
+        assert_eq!(total, 6);
+    }
+}
+```
+
+调用 `sum` 之后不再允许使用 `v1_iter` 因为调用 `sum` 时它会获取迭代器的所有权。
+
+
+
+
+
+
+
+
 
 
 
