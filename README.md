@@ -1646,17 +1646,71 @@ Rust 在发现类型和 trait 实现满足三种情况时会进行 Deref 强制�
 - 当 `T: DerefMut<Target=U>` 时从 `&mut T` 到 `&mut U`。
 - 当 `T: Deref<Target=U>` 时从 `&mut T` 到 `&U`。
 
+### 使用 Drop Trait 运行清理代码
 
+`drop` 函数体是放置任何当类型实例离开作用域时期望运行的逻辑的地方。
 
+```rust
+// 结构体 CustomSmartPointer，其实现了放置清理代码的 Drop trait
+struct CustomSmartPointer {
+    data: String,
+}
 
+// drop 函数体是放置任何当类型实例离开作用域时期望运行的逻辑的地方。
+impl Drop for CustomSmartPointer {
+    fn drop(&mut self) {
+        println!("Dropping CustomSmartPointer with data `{}`!", self.data);
+    }
+}
 
+// Drop trait 要求实现一个叫做 drop 的方法，它获取一个 self 的可变引用。
+// 为了能够看出 Rust 何时调用 drop，让我们暂时使用 println! 语句实现 drop。
+fn main() {
+    let c = CustomSmartPointer {
+        data: String::from("my stuff"),
+    };
+    let d = CustomSmartPointer {
+        data: String::from("other stuff"),
+    };
+    println!("CustomSmartPointers created.");
+}
 
+// 结果是   后drop 先丢弃
+CustomSmartPointers created.
+Dropping CustomSmartPointer with data `other stuff`!
+Dropping CustomSmartPointer with data `my stuff`!
+```
 
+注意无需显式调用 `drop` 方法。
 
+当实例离开作用域 Rust 会自动调用 `drop`，并调用我们指定的代码。变量以被创建时相反的顺序被丢弃，所以 `d` 在 `c` 之前被丢弃。这个例子刚好给了我们一个 drop 方法如何工作的可视化指导，不过通常需要指定类型所需执行的清理代码而不是打印信息。
 
+#### 通过 `std::mem::drop` 提早丢弃值
 
+Rust 并不允许我们主动调用 `Drop` trait 的 `drop` 方法；当我们希望在作用域结束之前就强制释放变量的话，我们应该使用的是由标准库提供的 `std::mem::drop`。
 
+```rust
+struct CustomSmartPointer {
+    data: String,
+}
 
+impl Drop for CustomSmartPointer {
+    fn drop(&mut self) {
+        println!("Dropping CustomSmartPointer with data `{}`!", self.data);
+    }
+}
+
+fn main() {
+    let c = CustomSmartPointer {
+        data: String::from("some data"),
+    };
+    println!("CustomSmartPointer created.");
+    drop(c);
+    println!("CustomSmartPointer dropped before the end of main.");
+}
+```
+
+表明了 `drop` 方法被调用了并在此丢弃了 `c`。
 
 
 
