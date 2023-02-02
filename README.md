@@ -1791,9 +1791,50 @@ fn main() {
 
 在不可变值内部改变值就是 **内部可变性** 模式。
 
+### 引用循环会导致内存泄漏
+
+使用智能指针来做出不同于 Rust 常规引用默认所提供的保证与取舍。`Box<T>` 有一个已知的大小并指向分配在堆上的数据。`Rc<T>` 记录了堆上数据的引用数量以便可以拥有多个所有者。`RefCell<T>` 和其内部可变性提供了一个可以用于当需要不可变类型但是需要改变其内部值能力的类型，并在运行时而不是编译时检查借用规则。
 
 
 
+## 无畏并发
+
+### 使用线程同时地运行代码
+
+在大部分现代操作系统中，已执行程序地代码在一个进程(process)中运行，操作系统则会负责管理多个进程。在程序内部，也可以拥有多个同时运行地独立部。这些运行这些独立部分地功能被称为线程(threads)。
+
+#### 使用`spawn`创建新线程
+
+为了创建一个新线程，需要调用`thread::spawn`函数并传递一个闭包，并在其中包含希望在新线程运行的代码。
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {} from the spawned thread!", i);
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {} from the main thread!", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+}
+```
+
+#### 使用`join`等待所有线程结束
+
+由于上面`spawn`无法保证新建线程执行完，可以通过将`thread::spawn`的返回值储存在变量中来修复新建线程部分没有执行或者完全没有执行的问题。
+
+`thread::spawn`的返回值类型是`JoinHandle`。`JoinHandle`是一个拥有所有权的值，当对其调用`join`方法时，它会等待其线程结束。如下所示：
+
+```rust
+
+```
 
 
 
