@@ -1871,11 +1871,38 @@ fn main() {
         println!("Here's a vector: {:?}", v);
     });
     
-    handle.join().unwr
+    handle.join().unwrap();
 }
 ```
 
+### 使用消息传递在线程间通信
 
+为了实现消息传递并发，Rust标准库提供了一个信道(channel)实现，表示数据从一个线程发送到另一个线程。
+
+编程中的信道由两部分组成，一个发送者(transmitter)和一个接收者(receiver)。当发送者或接收者任一被丢弃时可以认为信道被关闭(closed)了。
+
+使用 `mpsc::channel` 函数创建一个新的信道；`mpsc` 是 **多个生产者，单个消费者**（*multiple producer, single consumer*）的缩写。简而言之，Rust 标准库实现信道的方式意味着一个信道可以有多个产生值的 **发送**（*sending*）端，但只能有一个消费这些值的 **接收**（*receiving*）端。
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+    
+    thread::spawn(move || {
+        let val = String::from("hi");
+        tx.send(val).unwrap();
+    });
+    
+    let received = rx.recv().unwrap();
+    println!("Got: {}", rec)
+}
+```
+
+信道的接收者有两个有用的方法：`recv` 和 `try_recv`。这里，我们使用了 `recv`，它是 *receive* 的缩写。这个方法会阻塞主线程执行直到从信道中接收一个值。一旦发送了一个值，`recv` 会在一个 `Result<T, E>` 中返回它。当信道发送端关闭，`recv` 会返回一个错误表明不会再有新的值到来了。
+
+`try_recv` 不会阻塞，相反它立刻返回一个 `Result<T, E>`：`Ok` 值包含可用的信息，而 `Err` 值代表此时没有任何消息。如果线程在等待消息过程中还有其他工作时使用 `try_recv` 很有用：可以编写一个循环来频繁调用 `try_recv`，在有可用消息时进行处理，其余时候则处理一会其他工作直到再次检查。
 
 
 
