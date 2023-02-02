@@ -1833,8 +1833,49 @@ fn main() {
 `thread::spawn`的返回值类型是`JoinHandle`。`JoinHandle`是一个拥有所有权的值，当对其调用`join`方法时，它会等待其线程结束。如下所示：
 
 ```rust
+use std::thread;
+use std::time::Duration;
 
+fn main() {
+    let handle = thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {} from the spawned thread!", i);
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {} from the main thread!", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+
+    handle.join().unwrap();
+}
 ```
+
+#### 线程与move闭包
+
+`move`关键字经常用于传递给`thread::spawn`的闭包，因为闭包会获取从环境中取得的值的所有权，因此会将这些值的所有权从一个线程传送到另一个线程。
+
+可以在参数列表前使用`move`关键字强制闭包获取其使用的环境值的所有权。这个技巧在创建新县城将值的所有权从一个线程移动到另一个线程是最为实用。
+
+使用`move`关键字强制获取它使用的值的所有权
+
+```rust
+use std::thread;
+
+fn main() {
+    let v = vec![1, 2, 3];
+    
+    let handle = thread::spawn(move || {
+        println!("Here's a vector: {:?}", v);
+    });
+    
+    handle.join().unwr
+}
+```
+
+
 
 
 
