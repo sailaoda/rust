@@ -1896,7 +1896,7 @@ fn main() {
     });
     
     let received = rx.recv().unwrap();
-    println!("Got: {}", rec)
+    println!("Got: {}", received);
 }
 ```
 
@@ -1904,9 +1904,48 @@ fn main() {
 
 `try_recv` 不会阻塞，相反它立刻返回一个 `Result<T, E>`：`Ok` 值包含可用的信息，而 `Err` 值代表此时没有任何消息。如果线程在等待消息过程中还有其他工作时使用 `try_recv` 很有用：可以编写一个循环来频繁调用 `try_recv`，在有可用消息时进行处理，其余时候则处理一会其他工作直到再次检查。
 
+#### 信道与所有权转移
 
+`send` 函数获取其参数的所有权并移动这个值归接收者所有。
 
+在 `tx.send(val).unwrap();`之后就无法再使用了，例如 `println!("val is {}", val);`会有问题。
 
+#### 发送多个值并观察接收者的等待
+
+新建线程现在会发送多个消息并在每个消息之间暂停一秒钟。
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("hi"),
+            String::from("from"),
+            String::from("the"),
+            String::from("thread"),
+        ];
+
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    for received in rx {
+        println!("Got: {}", received);
+    }
+}
+```
+
+在主线程中，不再显式调用 `recv` 函数：而是将 `rx` 当作一个迭代器。对于每一个接收到的值，我们将其打印出来。当信道被关闭时，迭代器也将结束。
+
+可以说主线程是在等待从新建线程中接收值。
+
+#### 通过克隆发送者来创建多个生产者
 
 
 
