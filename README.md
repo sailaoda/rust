@@ -2013,8 +2013,62 @@ Rust中，得益于类型系统和所有权，使得通过共享内存实现并�
 性能安全带有性能惩罚，我们只希望在必要时为其买单。如果只是在单线程中对值进行操作，原子性提供的保证并无必要，代码可以因此运行的更快。
 
 ```rust
+// 多线程和多所有权
+use std::sync::{Arc, Mutex};
+use std::thread;
 
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    // 收集了所有的 join 句柄，调用它们的 join 方法来确保所有线程都会结束。
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
 ```
+
+### 使用`Sync`和`Send trait`的可扩展并发
+
+有两个并发概念是内嵌于语言中的：`std::marker` 中的 `Sync` 和 `Send` trait。
+
+#### 通过`Send`允许在线程间转移所有权
+
+`Send` 标记 trait 表明实现了 `Send` 的类型值的所有权可以在线程间传送。
+
+任何完全由`Send`的类型组成的类型也会自动标记为`Send`。几乎所有的基本类型都是`Send`的，除了裸指针(raw pointer)。
+
+#### `Sync`允许多线程访问
+
+`Sync`标记trait表明一个实现了`Sync`的类型可以安全的在多个线程中拥有其值的引用。
+
+对于任意类型T，如果&T（T的不可变引用）是`Send`的话T就是`Sync`的，这意味着其引用就可以安全的发送到另一个线程。例如 `Mutex<T>`是`Sync`的，可以被用来在多线程中共享访问。
+
+#### 手动实现`Send`和`Sync`是不安全的
+
+通常不需要手动实现`Send`和`Sync` trait，因为由`Send`和`Sync`的类型组成的类型，自动就是`Send`和`Sync`的。因为他们是标记trait，甚至都不需要实现任何方法。他们只是用来加强并发相关的不可变性的。
+
+手动实现这些trait涉及到编写不安全的Rust代码。
+
+Rust 提供了用于消息传递的信道，和像 `Mutex<T>` 和 `Arc<T>` 这样可以安全的用于并发上下文的智能指针。类型系统和借用检查器会确保这些场景中的代码，不会出现数据竞争和无效的引用。一旦代码可以编译了，我们就可以坚信这些代码可以正确的运行于多线程环境。
+
+
+
+
+
+
 
 
 
