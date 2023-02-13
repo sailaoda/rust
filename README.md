@@ -2105,17 +2105,135 @@ Rust 提供了用于消息传递的信道，和像 `Mutex<T>` 和 `Arc<T>` 这�
 
 ### 面向对象设计模式的实现
 
+**状态模式**(state pattern)是一个面向对象设计模式。该模式的关键在于定义一系列的内含状态。这些状态体现为一系列的**状态对象**，同时值的行为随着其内部状态而改变。
 
+状态对象共享功能：当然，在Rust中使用结构体和trait而不是对象和继承。每一个状态对象负责其自身的行为，以及该状态何时应当转移至另一个状态。持有一个状态对象的值对于不同状态的行为以及何时状态转移毫不知情。
 
+```rust
+use blog::Post;
 
+fn main() {
+    let mut post = Post::new();
 
+    post.add_text("I ate a salad for lunch today");
+    assert_eq!("", post.content());
 
+    post.request_review();
+    assert_eq!("", post.content());
 
+    post.approve();
+    assert_eq!("I ate a salad for lunch today", post.content());
+}
+```
 
+#### 定义Post并新建一个草案状态的实例
 
+```rust
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
 
+impl Post {
+    pub fn new() -> Post {
+        Post {
+            state: Some(Box::new(Draft {})),
+            content: String::new(),
+        }
+    }
+}
 
+trait State {}
 
+struct Draft {}
+
+impl State for Draft {}
+```
+
+#### 存放博文内容的文本
+
+实现方法`add_text`来向博文的`content`增加文本
+
+```rust
+impl Post {
+	// --snip--
+    pub fn add_text(&mut self, text: &str) {
+        self.content.push_str(text);
+    }
+}
+```
+
+#### 确保博文草案的内容是空的
+
+增加一个Post的content方法的占位实现，总是返回一个空字符串slice
+
+```rust
+impl Post {
+    // --snip--
+    pub fn content(&self) -> &str {
+        ""
+    }
+}
+```
+
+#### 请求审核博文来改变其状态
+
+增加请求审核博文的功能，这应当将其状态由`Draft`改为`PendingReview`。
+
+```rust
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
+
+impl Post {
+    // --snip--
+    pub fn new() -> Post {
+        Post {
+            state: Some(Box::new(Draft {})),
+            content: String::new(),
+        }
+    }
+
+    pub fn add_text(&mut self, text: &str) {
+        self.content.push_str(text);
+    }
+
+    pub fn content(&self) -> &str {
+        ""
+    }
+
+    pub fn request_review(&mut self) {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.request_review())
+        }
+    }
+}
+
+trait State {
+    fn request_review(self: Box<Self>) -> Box<dyn State>;
+}
+
+struct Draft {}
+
+impl State for Draft {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        Box::new(PendingReview {})
+    }
+}
+
+struct PendingReview {}
+
+impl State for PendingReview {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+}
+```
+
+为了消费老状态，`request_review` 方法需要获取状态值的所有权。这就是 `Post` 的 `state` 字段中 `Option` 的来历：调用 `take` 方法将 `state` 字段中的 `Some` 值取出并留下一个 `None`，因为 Rust 不允许结构体实例中存在值为空的字段。这使得我们将 `state` 的值移出 `Post` 而不是借用它。接着我们将博文的 `state` 值设置为这个操作的结果。
+
+#### 增加改变content行为的approve方法
 
 
 
