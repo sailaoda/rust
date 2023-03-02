@@ -2237,6 +2237,200 @@ impl State for PendingReview {
 
 
 
+## 模式与模式匹配
+
+模式（Patterns）是Rust中特殊的语法，它用来匹配类型中的结构，无论简单类型还是复杂类型。
+
+模式由如下一些内容组合而成：
+
+- 字面值
+- 解构的数组、枚举、结构体或者元组
+- 变量
+- 通配符
+- 占位符
+
+### 所有可能会用到模式的位置
+
+#### `match`分支
+
+一个模式常用的位置是`match`表达式的分支。在形式上`match`表达式由`match`关键字、用于匹配的值和一个或多个分支构成，这些分支包含一个模式和在值匹配分支的模式时运行的表达式：
+
+```rust
+match VALUE {
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+}
+```
+
+例如：
+
+```rust
+// 这个match表达式的模式为每个箭头左边的None和Some(i)
+match x {
+    None => None,
+    Some(i) => Some(i + 1),
+}
+```
+
+`match`表达式必须是**穷尽**(exhaustive)的，`match`表达式所有可能的值都必须被考虑到。
+
+一个确保覆盖每个可能值的方法是在最后一个分支使用捕获所有的模式：比如，一个匹配任何值的名称永远也不会失败，因此可以覆盖所有匹配剩下的情况。
+
+有一个特定的模式 `_` 可以匹配所有情况，不过它从不绑定任何变量。
+
+#### if let 条件表达式
+
+```rust
+fn main() {
+    let favorite_color: Option<&str> None;
+    let is_tuesday = false;
+    let age: Result<u8, _> = "34".parse();
+    
+    if let Some(color) = favorite_color {
+        println!("Using your favorite color, {color}, as the backgroud");
+    } else if is_tuesday {
+        println!("Tuesday is green day!");
+    } else if let Ok(age) = age {
+        if age > 30 {
+            println!("Using purple as the background color");
+        } else {
+            println!("Using orange as the background color");
+        }
+    } else {
+        println!("Using blue as the background color");
+    }
+}
+```
+
+#### `while let`条件循环
+
+`while let`条件循环，允许只要模式匹配就一直进行`while`循环。
+
+```rust
+// 使用 while let 循环只要 stack.pop() 返回Some就打印出其值
+// 使用 while let 来弹出栈中的每一个元素
+fn main() {
+    let mut stack = Vec::new();
+    
+    stack.push(1);
+    stack.push(2);
+    stack.push(3);
+    
+    while let Some(top) = stack.pop() {
+        println!("{}", top);
+    }
+}
+```
+
+#### for 循环
+
+在`for`循环中，模式是`for`关键字直接跟随的值，正如`for x in y`中的`x`。
+
+```rust
+// 使用 for 循环来解构，或拆开一个元组作为 for 循环的一部分
+fn main() {
+    let v = vec!['a', 'b', 'c'];
+    
+    for (index, value) in v.iter().enumerate() {
+        println!("{} is at index {}", value, index);
+    }
+}
+```
+
+这里使用的`enumerate`方法适配一个迭代器来产生一个值和其在迭代器中的索引，他们位于一个车元组中。第一个产生的值是元组`(0, 'a')`。当这个值匹配模式(index, value)，打印。
+
+#### let 语句
+
+`let`表达式也是使用模式：
+
+```rust
+let x = 5;
+let PATTERN = EXPRESSION;
+```
+
+ 将表达式与模式比较，并为任何找到的名称赋值。这个模式实际上等于 “将任何值绑定到变量x，不管值是什么”。
+
+```rust
+let (x, y, z) = (2, 3, 4);
+```
+
+#### 函数参数
+
+函数参数也可以是模式。
+
+```rust
+// x 部分就是一个模式
+fn foo(x: i32) {
+    
+}
+
+// 一个在参数中解构元组的函数
+fn print_coordinates(&(x, y): &(i32, i32)) {
+    println!("Current location: ({}, {})", x, y);
+}
+fn main() {
+    let point = (3, 5);
+    print_coordinates(&point);
+}
+```
+
+在一些地方，模式必须是irrefutable的，意味着他们必须匹配所提供的任何值。在另一些情况，他们则可以是refutable的。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
