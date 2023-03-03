@@ -2395,9 +2395,41 @@ if let Some(x) = some_option_value {
 
 `match`匹配分支必须使用可反驳模式，除了最后一个分支需要使用能匹配任何剩余值的不可反驳模式。
 
+### 模式语法
 
+#### 匹配字面值
 
+可以直接匹配字面值模式
 
+```rust
+fn main() {
+    let x = 1;
+    
+    match x {
+        1 => println!("one");
+        2 => println!("two");
+        _ => println!("anything");
+    }
+}
+```
+
+#### 匹配命名变量
+
+命名变量是匹配任何值的不可反驳模式。当其用于`match`表达式时情况会有些复杂，因为`match`会开始一个新作用域，`match`表达式中作为模式的一部分生命的变量会覆盖`match`结构之外的同名变量。
+
+```rust
+fn main() {
+    let x = Some(5);
+    let y = 10;
+    
+    match x {
+        Some(50) => println!("Got 50"),
+        Some(y) => println!("Matched, y = {y}"),
+        - => println!("Default case, x = {:?}", x),
+    }
+    println!("at the end: x = {:?}, y = {y}", x);
+}
+```
 
 
 
